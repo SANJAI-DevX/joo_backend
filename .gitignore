@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment Variables
+.env
+.env.*
+
+# Static files (if collected)
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Migrations (optional - keep only if you don't want them in Git)
+# */migrations/
+# !*/migrations/__init__.py
+
+# Build
+dist/
+build/
+
+# Python cache
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# VS Code History
+.history/
