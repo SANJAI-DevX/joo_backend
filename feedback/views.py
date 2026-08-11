@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Feedback, FeedbackComment
@@ -130,6 +131,8 @@ class AdminLoginView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     parser_classes = [JSONParser, FormParser]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "admin_login"
 
     def post(self, request):
         username = request.data.get("username", "").strip()
