@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ContactInfo, ContentBlock
+from .models import ContactInfo, ContentBlock, Driver
 
 
 @admin.register(ContentBlock)
@@ -18,3 +18,9 @@ class ContactInfoAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(Driver)
+class DriverAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "order")
+    ordering = ("order", "id")

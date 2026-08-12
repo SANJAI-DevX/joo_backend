@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ContactInfo, ContentBlock
+from .models import ContactInfo, ContentBlock, Driver
 
 
 class ContentBlockPublicSerializer(serializers.ModelSerializer):
@@ -16,15 +16,21 @@ class ContentBlockAdminSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "section", "key", "label", "order", "updated_at"]
 
 
+class DriverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = ["id", "name", "phone", "order"]
+        read_only_fields = ["id"]
+
+
 class ContactInfoSerializer(serializers.ModelSerializer):
+    drivers = DriverSerializer(many=True, read_only=True)
+
     class Meta:
         model = ContactInfo
         fields = [
             "whatsapp_number",
-            "driver1_name",
-            "driver1_phone",
-            "driver2_name",
-            "driver2_phone",
+            "drivers",
             "email",
             "address",
             "updated_at",

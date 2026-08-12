@@ -33,10 +33,6 @@ class ContactInfo(models.Model):
     whatsapp_number = models.CharField(
         max_length=20, help_text="Digits only with country code, e.g. 919524788173"
     )
-    driver1_name = models.CharField(max_length=60, blank=True)
-    driver1_phone = models.CharField(max_length=20, blank=True)
-    driver2_name = models.CharField(max_length=60, blank=True)
-    driver2_phone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     address = models.CharField(max_length=255, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -59,3 +55,18 @@ class ContactInfo(models.Model):
 
     def __str__(self):
         return "Contact Info"
+
+
+class Driver(models.Model):
+    """One driver entry shown on the public site (footer) and editable as a list in admin."""
+
+    contact_info = models.ForeignKey(ContactInfo, related_name="drivers", on_delete=models.CASCADE)
+    name = models.CharField(max_length=60)
+    phone = models.CharField(max_length=20)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.name} ({self.phone})"

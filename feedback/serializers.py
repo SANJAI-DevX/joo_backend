@@ -44,7 +44,11 @@ class FeedbackListSerializer(serializers.ModelSerializer):
         }
 
     def get_comment_count(self, obj):
-        return obj.comments.count()
+        # Uses the annotated count from the queryset when available (avoids
+        # one extra query per row); falls back to a live count only if this
+        # serializer is ever used with a queryset that wasn't annotated.
+        annotated = getattr(obj, "comment_count_annotated", None)
+        return annotated if annotated is not None else obj.comments.count()
 
 
 class FeedbackCreateSerializer(serializers.ModelSerializer):

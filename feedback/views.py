@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.db import transaction
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -7,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Feedback, FeedbackComment
@@ -23,7 +24,7 @@ from .serializers import (
 class FeedbackListView(APIView):
     def get(self, request):
         limit = request.query_params.get("limit")
-        queryset = Feedback.objects.filter(is_approved=True)
+        queryset = Feedback.objects.filter(is_approved=True).annotate(comment_count_annotated=Count("comments"))
         if limit and limit.isdigit():
             queryset = queryset[: int(limit)]
         serializer = FeedbackListSerializer(queryset, many=True, context={"request": request})
@@ -32,6 +33,7 @@ class FeedbackListView(APIView):
 
 class FeedbackCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser]
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
         serializer = FeedbackCreateSerializer(data=request.data)
@@ -112,6 +114,13 @@ class FeedbackCommentListCreateView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     parser_classes = [JSONParser, FormParser]
+
+    def get_throttles(self):
+        # Only throttle comment submissions (spam protection); reading
+        # comments is a plain page-load GET and should never be rate-limited.
+        if self.request.method == "POST":
+            return [AnonRateThrottle()]
+        return []
 
     def get(self, request, pk):
         feedback = get_object_or_404(Feedback, pk=pk, is_approved=True)

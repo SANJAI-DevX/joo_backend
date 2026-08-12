@@ -4,8 +4,13 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import ContactInfo, ContentBlock
-from .serializers import ContactInfoSerializer, ContentBlockAdminSerializer, ContentBlockPublicSerializer
+from .models import ContactInfo, ContentBlock, Driver
+from .serializers import (
+    ContactInfoSerializer,
+    ContentBlockAdminSerializer,
+    ContentBlockPublicSerializer,
+    DriverSerializer,
+)
 
 
 class PublicContentBlocksView(APIView):
@@ -61,3 +66,15 @@ class ContactInfoAdminView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class DriverAdminViewSet(viewsets.ModelViewSet):
+    """Admin CRUD for the dynamic driver list shown in the site footer."""
+
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def perform_create(self, serializer):
+        serializer.save(contact_info=ContactInfo.load())
